@@ -1,57 +1,6 @@
-#!/usr/bin/env php
 <?php
-/**
- * MakeSum.php
- *
- * Script CLI de création de sommaire.
- *
- * @author    Nicolas DUPRE
- * @release   05/01/2018
- * @version   0.0.0
- * @package   Index
- *
- * @TODO : Activer / Désactiver la numérotation.
- * @TODO : Selectionner un modèle de numérotation.
- * @TODO : Définir la plage de niveau de réalisation du sommayre (def, 0 to unlimitd).
- * @TODO : Définir la plage de niveau de numérotation automatique.
- *
- */
-
-/**
- * Version 1.0.0 : 05/01/2018
- * --------------------------
- *
- *
- */
-
-namespace MakeSummary;
-
-use Exception;
-use InvalidArgumentException;
-
 class MakeSum
 {
-    /**
-     * Liste des différentes options utilisée dans la classe MakeSum.
-     */
-    const OPTIONS = [
-        'colors' => [
-            'color_err' => '196',
-            'color_in' => '220',
-            'color_suc' => '76',
-            'color_war' => '208',
-            'color_txt' => '221',
-            'color_kwd' => '39'
-        ],
-        'separator' => ',',
-        'shortopt' => "hd:",
-        "longopt" => [
-            "help",
-            "debug",
-            "dir:",
-        ]
-    ];
-
     /**
      * @var string $workdir Dossier de travail
      */
@@ -73,69 +22,6 @@ class MakeSum
     protected $defaultLang = "markdown";
 
     /**
-     * @var array $langAliases Liste d'alias pointant vers la configuration exacte pour le language à traiter.
-     */
-    protected $langAliases = [
-        "markdown" => "markdown",
-        "md" => "markdown"
-    ];
-
-    /**
-     * @var array $langRegister Registre des configurations fonctionnelles par langage de développement.
-     */
-    protected $langRegister = [
-        "markdown" => [
-            "extension" => "/\.md$/i",
-            "insertTag" => '[](MakeSummary)',
-            "openTag" => '[](BeginSummary)',
-            "closeTag" => '[](EndSummary)',
-            // @TODO : MakeSummary\linkable
-            "linkable" => true,
-            // @TODO : MakeSummary\createAnchor
-            "createAnchor" => false,
-            // @TODO : MakeSummary\style
-            "style" => "none",
-            "substitution" => [
-                "chars" => [
-                    "\s" => "-",
-                    "\." => "",
-                    "'" => "",
-                    "`" => "",
-                    ":" => "",
-                    "-{2,}" => "-"
-                ],
-                "functions" => [
-                    "urlencode" => [],
-                    "strtolower" => []
-                ],
-                // $t Emplacement de la tabulation.
-                // $x Insertion du match numéro x.
-                // $s Insertion de la substitution.
-                "final" => '$t* [$2](#$s)'
-            ],
-            "tabulated" => true,
-            "eol" => true,
-            "tabsize" => 4,
-            "taboffset" => 0,
-            "title" => [
-                "pattern" => "/^\s*(#+)\s*(.*)$/m",
-                "levelMatch" => 1,
-                "stringMatch" => 2,
-                // string, (pattern, number)
-                "levelType" => "string",
-                "levelIndicator" => "#"
-            ],
-            "startLevel" => 2,
-            "endLevel" => 9
-        ]
-    ];
-
-    /**
-     * @var array $langsToProcess Liste des langues à traiter.
-     */
-    protected $langsToProcess = [];
-
-    /**
      * @var bool|resource $psdtout Pointeur vers la ressource de sortie standard.
      */
     protected $psdtout = STDOUT;
@@ -149,60 +35,6 @@ class MakeSum
      * @var bool $noDie Flag pour ne pas jouer les evenements die.
      */
     protected $noDie = false;
-
-    /**
-     * Constructor function.
-     *
-     * @param string $workdir Path to working directory.
-     * @param array  $argv    Array of command line arguments.
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($workdir, array $argv, $cmdName)
-    {
-        $workdir = trim($workdir);
-        if (empty($workdir)) {
-            throw new InvalidArgumentException("workdir parameter in constructor can't be empty.");
-        }
-        if (!is_dir($workdir)) {
-            throw new InvalidArgumentException("workdir `{$workdir}` doesn't exist.");
-        }
-        $this->workdir = $workdir;
-        $this->argv = $argv;
-        $this->cmdName = $cmdName;
-
-        $this->addLangToProcess($this->defaultLang);
-
-    }
-
-    /**
-     * Exécution du script.
-     *
-     * @return bool
-     */
-    public function __run ()
-    {
-        $options = $this->argv;
-        $showHelp = true;
-
-        $directory = @($options["d"]) ?: (@$options["dir"]) ?: $this->workdir;
-
-        $fullPath = (preg_match("#^\/|^[[:alpha:]]{1}:#", $directory)) ? $directory : $this->workdir . '/' . $directory;
-
-        // Afficher l'aide si demandée et s'arrêter là.
-        if (
-            array_key_exists("h", $options)
-            || array_key_exists("help", $options)
-        ) {
-            $this->help();
-            return true;
-        }
-
-        // Traitement
-        $this->parse($fullPath);
-
-        return true;
-    }
 
     /**
      * Enregistre un alias de nom de langue vers un nom reel.
@@ -222,50 +54,6 @@ class MakeSum
         $this->langAliases[$aliasName] = $realName;
 
         return true;
-    }
-
-    /**
-     * Ajoute une langue à traiter.
-     *
-     * @param string $langName      Nom d'usage de la langue.
-     * @param string $configName    Nom réel dont il faudra utiliser la configuration.
-     *
-     * @return bool
-     */
-    public function addLangToProcess ($langName, $configName = 'markdown')
-    {
-        // Si la langue n'est pas dans la liste des langages à traiter.
-        if (!in_array($langName, $this->langsToProcess)) {
-            $this->langsToProcess[] = $langName;
-
-            $this->addAlias($langName, $configName);
-        }
-
-        return true;
-    }
-
-    /**
-     * Affiche le manuel d'aide.
-     *
-     * @param int $level
-     *
-     * @return void
-     */
-    protected function help($level = 0)
-    {
-        $separator = self::OPTIONS['separator'];
-        $name = $this->cmdName;
-
-        $man = <<<HELP
-        
-Usage : $name [OPTIONS]
-
-
-
--d, --dir   Spécifie l'emplacement de travail.
-HELP;
-        fwrite($this->psdtout, $man . PHP_EOL);
-        if ($level) die($level);
     }
 
     /**
@@ -290,59 +78,21 @@ HELP;
 
     protected function parse ($path)
     {
-        // S'il l'emplacement demandé n'existe pas, on stop le process.
-        if (!file_exists($path)) $this->stderr("The following path %s does not exist", [$path]);
-
         // S'il s'agit d'un dossier, le parcourir.
         if (is_dir($path)) {
-            $dir = opendir($path);
-
-            while ($file = readdir($dir)) {
-                // Ignorer les références de navigation.
-                if (preg_match("/^\.{1,2}$/", $file)) continue;
-
-                $this->parse($path . '/' . $file);
-            }
-
-            closedir($dir);
+            // DONE
         }
         // S'il s'agit d'un fichier, l'analyser.
         else {
-            /**
-             * Phase d'initialisation :: Données transverses.
-             *
-             * @var string $configName      Nom réel correspondant à la configuration à utiliser.
-             * @var array  $options         Options fournies dans la ligne de commande.
-             * @var bool   $summaryUpdate   Indique s'il s'agit d'une mise à jour de sommaire.
-             * @var bool   $continue        Indique si l'on continue le processus de sommairisation.
-             * @var bool   $debug           Affiche des messages détaillés pour le debugguage.
-             */
-            $configName = null;
-            $options = $this->argv;
-            $summaryUpdate = false;
-            $continue = false;
-            $debug = array_key_exists('debug', $options);
-
-
-
-            /**
-             * Phase de contrôle.
-             *
-             * Récupération du fichier.
-             *
-             * @var string $filename Nom du fichier au format name.ext
-             */
-            $filename = basename($path);
-
-
             /**
              * Est-ce un fichier à traiter.
              *
              * @var bool $return Indicateur demandant l'envois final false. Fin du traitement.
              */
-            $return = true;
+//            $return = true;
 
-            foreach ($this->langsToProcess as $langIdx => $langName) {
+            // @TODO : >>> ICI >>>>>>> LANGUIAGES
+            foreach ($this->LANGUIAGES as $langIdx => $langName) {
                 $realName = $this->langAliases[$langName];
                 $extension = $this->langRegister[$realName]['extension'];
 
@@ -599,31 +349,6 @@ HELP;
         return true;
     }
 
-    public function setLangsToProcess ()
-    {
-
-    }
-
-    public function registerLang ()
-    {
-
-    }
-
-    public function removeAlias ()
-    {
-
-    }
-
-    public function removeLangToProcess ()
-    {
-
-    }
-
-    public function unregisterLang ()
-    {
-
-    }
-
     /**
      * Emet des messages dans le flux STDERR de niveau WARNING ou ERROR
      *
@@ -668,49 +393,5 @@ HELP;
         }
     }
 
-    /**
-     * Définie la ressource de sortie standard.
-     *
-     * @param bool|resource $stdout Pointeur vers une ressource ayant un accès en écriture.
-     */
-    public function setStdout($stdout = STDOUT)
-    {
-        $this->psdtout = $stdout;
-    }
-
-    /**
-     * Définie la ressource de sortie des erreurs.
-     *
-     * @param bool|resource $stderr Pointeur vers une ressource ayant un accès en écriture.
-     */
-    public function setStderr($stderr = STDERR)
-    {
-        $this->pstderr = $stderr;
-    }
-
-    /**
-     * Définie le comportement des fonctions die.
-     *
-     * @param bool $nodie
-     */
-    public function setNoDie($nodie = false)
-    {
-        $this->noDie = $nodie;
-    }
-
 }
 
-
-
-/**
- * Instanciation à la volée et exécution.
- */
-$options = getopt(
-    MakeSum::OPTIONS['shortopt'],
-    MakeSum::OPTIONS['longopt']
-);
-
-$commandName = basename($_SERVER['SCRIPT_NAME']);
-$workdir = ($_SERVER["PWD"]) ?: '.';
-
-(new MakeSum($workdir, $options, $commandName))->__run();

@@ -30,7 +30,7 @@
  * TODOS:
  * ----------------------------------------------------------------------------
  */
-//@TODO : Check si run existe !
+
 
 
 
@@ -43,9 +43,14 @@
 const os       = require('os');
 const fs       = require('fs');
 const readline = require('readline');
+const nodepath = require('path');
 
 // Dependencies :
 const opt = require('ifopt');
+
+// Constante
+const dbgopn = '>>>--------------[ DEBUG DUMP ]-----------------';
+const dbgcls = '<<<---------------------------------------------';
 
 
 
@@ -59,18 +64,19 @@ const opt = require('ifopt');
 // Caractères suivis par deux-points (valeur optionnelle)
 const options = {
     separator: ",",
-    shortopt: "hd:v",
+    shortopt: "hd:vr",
     longopt: [
         "help",
         "dir:",
         "debug",
         "no-color",
-        "verbose"
+        "verbose",
+        "recursive"
     ],
 };
 
 // Source: https://misc.flogisoft.com/bash/tip_colors_and_formatting
-// opt.setColor('fg.Debug', '\x1b[38;5;208m');
+ opt.setColor('fg.Debug', '\x1b[38;5;208m');
 
 
 
@@ -79,13 +85,93 @@ const options = {
  * Global Variables Déclaration.
  * ----------------------------------------------------------------------------
  */
-let PWD      = process.env.PWD;
-let SHOWHELP = true;
-let DEBUG    = false;
-let VERBOSE  = false;
-let OPTS     = [];
-let log      = opt.log;
-let clog     = console.log;
+let PWD       = process.env.PWD;
+let SHOWHELP  = true;
+let DEBUG     = false;
+let VERBOSE   = false;
+let OPTS      = [];
+let log       = opt.log;
+let clog      = console.log;
+
+/**
+ * @var array LANGUAGE Liste des languages à traiter.
+ */
+ */
+let LANGUAGES = [];
+
+/**
+ * @var array $langRegister Registre des configurations fonctionnelles par langage de développement.
+ */
+let LANG_SETTINGS = {
+    "markdown": {
+        // Pattern to identify file type
+        "extension": /\.md$/i,
+        // Instruction to place generated summary
+        "insertTag": "[](MakeSummary)",
+        // Once summary is generated, an opening tag is add for further updates
+        "openTag": "[](BeginSummary)",
+        // Once summary is generated, an closing tag is add for further updates
+        "closingTag": "[](EndSummary)",
+        // @TODO : MakeSummary / Linkable
+        "linkable": true,
+        // @TODO : MakeSummary / Create Anchor
+        "createAnchor": false,
+        // @TODO : MakeSummary / Style (list type style)
+        "style": "none",
+        // Indicating if we add tabulation (space) by title level.
+        "tabulated": true,
+        // Indicating if tabulation are spaces char.
+        "tabspace": true,
+        // How many space char represent one tabulation.
+        "tabsize": 4,
+        // Add an offset for tabulation (if needed).
+        "taboffset": 0,
+        //
+        "eol": true,
+        // Title recognise settings
+        "title": {
+            "pattern": /^\s*(#+)\s*(.*)$/m,  // Title text is in match 2
+            "levelMatch": 1,                 // Which match the title level is
+            "stringMatch": 2,                // Which match the title text  is
+            "levelType": "string",           // Type of data composing the level
+            "levelIndicator": "#"            // Entity defining the title level
+        },
+        // Settings to rewrite links and fixe some char
+        "substitution": {
+            // Liste of char replacement
+            "chars": {
+                "\s": "-",   // Replace spaces with dash
+                "\.": "",    // Replace dot    with nothing
+                "'": "",     // Replace quote  with nothing
+                "`": "",     // Replace        with nothing
+                ":": "",     // Replace colon  with nothing
+                "-{2,}": "-" // Replace double dash by one
+            },
+            // List of function to executes with arg
+            "functions": {
+                // urlencode []
+                // strtolower []
+            },
+            // Final replacement for output in file :
+            //  $t* is for tabluation(s).
+            //  $x  is for match number x referinf to the title recognize pattern.
+            //  $s  is for the substitution.
+            "final": "$t* [$2](#$s)",
+        },
+        // From which level the summary begins
+        "startLevel": 2,
+        // Until which level the summary take into account levels
+        "endLevel": 9
+    }
+};
+
+/**
+ * @var array ALIASES Liste d'alias pointant vers la configuration exacte pour le language à traiter.
+ */
+let ALIASES = {
+    "markdown" : "markdown",
+    "md" : "markdown"
+};
 
 
 /**
@@ -247,6 +333,86 @@ function removeColor(object) {
     return object;
 }
 
+function addLangToProcess(langName, configName = 'markdown') {
+    // Si the language is not in the list to process
+    // Registred it
+    if (LANGUAGES.lastIndexOf(langName)) return false;
+
+    LANGUAGES.push(langName);
+    addAlias(langName, configName);
+
+    return true;
+}
+
+function adddAlias(aliasName, realName) {
+    // Can we find an associated configuration
+    if (!ALIASES[realName]) {
+    }
+
+
+
+}
+
+function parse(path) {
+    // Get file data
+    let fStat = fs.statSync(path);
+
+    // If the location is a directory,
+    // read the dir only if recursive is requested.
+    if (fStat.isDirectory() && opt.isOption(['r', 'recursive'])) {
+        let dirContent = fs.readdirSync(path);
+        dirContent.forEach(function (file) {
+            // Do not process browse refernce (. and ..)
+            if (!/^\.{1,2}$/.test(file)) {
+                parse(`${path}/${file}`);
+            }
+        });
+    }
+    // If the location is a file, parse the file
+    else {
+        /**
+         * Phase d'initialisation :: Données transverses.
+         *
+         * @var {string} configName      Nom réel correspondant à la configuration à utiliser.
+         * @var {array}  options         Options fournies dans la ligne de commande.
+         * @var {bool}   summaryUpdate   Indique s'il s'agit d'une mise à jour de sommaire.
+         * @var {bool}   continue        Indique si l'on continue le processus de sommairisation.
+         * @var {bool}   debug           Affiche des messages détaillés pour le debugguage.
+         */
+        let configName    = null;
+        let options       = OPTS;
+        let summaryUpdate = false;
+        let continueFlag  = false;
+        let debug         = OPTS.debug || false;
+
+
+
+        /**
+         * Phase de contrôle.
+         *
+         * Récupération du fichier.
+         *
+         * @var string $filename Nom du fichier au format name.ext
+         */
+        let filename = nodepath.basename(path);
+
+
+
+        /**
+         * Est-ce un fichier à traiter.
+         *
+         * @var {boolean} return Indicateur demandant l'envois final false. Fin du traitement.
+         */
+        let returnFlag = true;
+
+        for (let i in LANGUAGES) {
+        }
+
+
+
+    }
+}
+
 
 /**
  * ----------------------------------------------------------------------------
@@ -254,6 +420,16 @@ function removeColor(object) {
  * ----------------------------------------------------------------------------
  */
 OPTS = opt.getopt(options.shortopt, options.longopt);
+
+
+
+/**
+ * ----------------------------------------------------------------------------
+ * Initializations
+ * ----------------------------------------------------------------------------
+ */
+// Set default language processed
+addLangToProcess('markdown');
 
 
 
@@ -273,9 +449,9 @@ if (OPTS.d || OPTS.debug) {
 }
 
 if (OPTS['no-color']) {
-    let colors = opt.getColors();
-    colors = removeColor(colors);
-    opt.setColors(colors);
+    // let colors = opt.getColors();
+    // colors = removeColor(colors);
+    // opt.setColors(colors);
 }
 
 
@@ -300,9 +476,36 @@ if (OPTS.h || OPTS.help) {
 }
 
 
-//@TODO:Rewrite HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 // Effectuer le traitement
 if (canRun()) {
+    let directory = OPTS.d || OPTS.dir;     // Try to get option
+
+    // If option found else use PWD
+    if (directory) {
+        directory = directory.val;
+    } else {
+        directory = PWD;
+    }
+
+    let fullpath = directory;
+
+    // Check root path for linux (/path/to) and windows (c:\)
+    if (!/^\/|[a-zA-Z]{1}:/.test(directory)) {
+        fullpath = `${PWD}/${directory}`;
+    }
+
+    if (VERBOSE || DEBUG) {
+        log("Processing directory : %s", 3, [fullpath]);
+    }
+
+    // Check if directory exist
+    fileExists(fullpath, 1);
+
+    // Processing
+    parse(fullpath);
+
+
     // Now issue with cli options, so do not display cli help.
     //----------------------------------------------------------------------
     SHOWHELP = false;
