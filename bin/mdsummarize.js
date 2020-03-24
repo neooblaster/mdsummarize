@@ -347,13 +347,25 @@ function addLangToProcess(langName, configName = 'markdown') {
     return true;
 }
 
-function adddAlias(aliasName, realName) {
+/**
+ * Enregistre un alias de nom de langue vers un nom reel.
+ *
+ * @param {String} aliasName Nom d'alias au format chaine de caractère alphanumérique.
+ * @param {String} realName  Nom de langue réel permetant l'utilisation de la configuration associée.
+ *
+ * @return {boolean}
+ */
+function addAlias(aliasName, realName) {
     // Can we find an associated configuration
-    if (!ALIASES[realName]) {
+    if (!LANG_SETTINGS[realName]) {
+        log("The configuration %s is not registred. " +
+            "Please use registerLang", [realName]
+        );
     }
 
+    ALIASES[aliasName] = realName;
 
-
+    return true;
 }
 
 function parse(path) {
