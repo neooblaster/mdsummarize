@@ -72,7 +72,7 @@ const options = {
         "no-color",
         "verbose",
         "recursive"
-    ],
+    ]
 };
 
 // Source: https://misc.flogisoft.com/bash/tip_colors_and_formatting
@@ -95,7 +95,6 @@ let clog      = console.log;
 
 /**
  * @var array LANGUAGE Liste des languages à traiter.
- */
  */
 let LANGUAGES = [];
 
@@ -222,19 +221,23 @@ function getFileContent (file) {
  */
 function help(level = 0) {
     let name = 'mdsumarize';
+    let tag = LANG_SETTINGS.markdown.insertTag;
     let helpText = `
 Usage : ${name} [OPTIONS]
 ------------------------------------------------------------
 
 {{${name}}} generates sumarizes for all Markdown file found
-in the specified folder which contain the tag {{&lt;tag&gt;}}.
+in the specified folder which contain the tag :
 
-{{-h}}, {{--help}}     Display this text.
-{{-d}}, {{--dir}}      Set the working directory.
-{{-v}}, {{--verbose}}  Verbose Mode.
-    {{--debug}}    Debug Mode.
-    {{--no-color}} Remove color in the console. Usefull to
-               redirect log in a debug file.
+                    {{${tag}}}
+
+{{-h}}, {{--help}}        Display this text.
+{{-r}}, {{--recursive}}   Display this text.
+{{-d}}, {{--dir}}         Set the working directory.
+{{-v}}, {{--verbose}}     Verbose Mode.
+    {{--debug}}       Debug Mode.
+    {{--no-color}}    Remove color in the console. Usefull to
+                  redirect log in a debug file.
 
 Details :
   
