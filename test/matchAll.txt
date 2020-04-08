@@ -1,0 +1,282 @@
+[
+  [
+    '# Main Title',
+    '#',
+    'Main Title',
+    index: 0,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n## Level 1.1',
+    '##',
+    'Level 1.1',
+    index: 30,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n### Level 2.1',
+    '###',
+    'Level 2.1',
+    index: 44,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n#### Level 3.1',
+    '####',
+    'Level 3.1',
+    index: 59,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n#### Level 3.2',
+    '####',
+    'Level 3.2',
+    index: 75,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n#### Level 3.3',
+    '####',
+    'Level 3.3',
+    index: 91,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n### Level 2.2.',
+    '###',
+    'Level 2.2.',
+    index: 107,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n### Level 2.3.',
+    '###',
+    'Level 2.3.',
+    index: 123,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n## Level 1.2',
+    '##',
+    'Level 1.2',
+    index: 139,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ],
+  [
+    '\n## Level 1.3',
+    '##',
+    'Level 1.3',
+    index: 153,
+    input: '# Main Title\n' +
+      '\n' +
+      '[](MakeSummary)\n' +
+      '\n' +
+      '## Level 1.1\n' +
+      '\n' +
+      '### Level 2.1\n' +
+      '\n' +
+      '#### Level 3.1\n' +
+      '\n' +
+      '#### Level 3.2\n' +
+      '\n' +
+      '#### Level 3.3\n' +
+      '\n' +
+      '### Level 2.2.\n' +
+      '\n' +
+      '### Level 2.3.\n' +
+      '\n' +
+      '## Level 1.2\n' +
+      '\n' +
+      '## Level 1.3\n',
+    groups: undefined
+  ]
+]

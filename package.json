@@ -24,6 +24,9 @@
     "bin": {
         "mdsummarize": "./bin/mdsummarize.js"
     },
+    "engines": {
+        "node": ">=12.4.0"
+    },
     "dependencies": {
         "ifopt": "^1.1.1"
     }
