@@ -21,28 +21,5 @@ class MakeSum
         return $message;
     }
 
-    protected function parse ($path)
-    {
-        // S'il s'agit d'un dossier, le parcourir.
-        if (is_dir($path)) {
-            // DONE
-        }
-        // S'il s'agit d'un fichier, l'analyser.
-        else {
-            /**
-             * Mise à jour du fichier
-             */
-            // @TODO : >>> ICI >>>>>>> PARSE
-            if ($debug) {
-                $this->stdout("1%s", ["In debug mode, no changes are applied to files."], "DEBUG");
-            }
-            else {
-                file_put_contents($path, $text);
-            }
-        }
-
-        return true;
-    }
-
 }
 

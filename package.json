@@ -1,6 +1,6 @@
 {
     "name": "mdsummarize",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "Nodejs module to generate automatically summaries in Markdown files",
     "main": "bin/mdsummarize.js",
     "scripts": {

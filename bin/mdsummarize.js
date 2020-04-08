@@ -579,8 +579,6 @@ function parse(path, root = true) {
             clog(dbgopn); cdir(titles); clog(dbgcls);
         }
 
-
-        // @TODO : >>> ICI >>>>>>> PARSE
         /**
          * Summary Creation
          */
@@ -690,7 +688,6 @@ function parse(path, root = true) {
             if (DEBUG) {
                 clog(dbgcls);
             }
-            // @TODO : >>> ICI >>>>>>> PARSE
         }
 
         if (DEBUG) {
@@ -709,7 +706,7 @@ function parse(path, root = true) {
             text = text.replace(replacePattern, `$1\n${summary}$3`);
         }
         else {
-            summary = openTag + os.EOL + summary + os.EOL + closeTag;
+            summary = openTag + os.EOL + summary + closeTag;
             text = text.replace(insertTagX, summary);
         }
 
@@ -726,7 +723,20 @@ function parse(path, root = true) {
     }
 }
 
-
+/**
+ * Count the number of substring occurrences.
+ *
+ * @param haystack   The string to search in
+ * @param needle     The substring to search for
+ * @param offset     The offset where to start counting.
+ *                   If the offset is negative, counting starts from the end
+ *                   of the string.
+ * @param length     The maximum length after the specified offset to search for
+ *                   the substring. It outputs a warning if the offset plus the
+ *                   length is greater than the haystack length.
+ *                   A negative length counts from the end of haystack.
+ * @return {boolean|number}
+ */
 function substr_count (haystack, needle, offset, length) {
     // eslint-disable-line camelcase
     //  discuss at: https://locutus.io/php/substr_count/
@@ -766,129 +776,6 @@ function substr_count (haystack, needle, offset, length) {
     return cnt;
 }
 
-function call_user_func_array (cb, parameters) {
-    // eslint-disable-line camelcase
-    //  discuss at: https://locutus.io/php/call_user_func_array/
-    // original by: Thiago Mata (https://thiagomata.blog.com)
-    //  revised by: Jon Hohle
-    // improved by: Brett Zamir (https://brett-zamir.me)
-    // improved by: Diplom@t (https://difane.com/)
-    // improved by: Brett Zamir (https://brett-zamir.me)
-    //      note 1: Depending on the `cb` that is passed,
-    //      note 1: this function can use `eval` and/or `new Function`.
-    //      note 1: The `eval` input is however checked to only allow valid function names,
-    //      note 1: So it should not be unsafer than uses without eval (seeing as you can)
-    //      note 1: already pass any function to be executed here.
-    //   example 1: call_user_func_array('isNaN', ['a'])
-    //   returns 1: true
-    //   example 2: call_user_func_array('isNaN', [1])
-    //   returns 2: false
-
-    var $global = (typeof window !== 'undefined' ? window : global);
-    var func;
-    var scope = null;
-
-    var validJSFunctionNamePattern = /^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*$/
-
-    if (typeof cb === 'string') {
-        if (typeof $global[cb] === 'function') {
-            func = $global[cb]
-        } else if (cb.match(validJSFunctionNamePattern)) {
-            func = (new Function(null, 'return ' + cb)()) // eslint-disable-line no-new-func
-        }
-    } else if (Object.prototype.toString.call(cb) === '[object Array]') {
-        if (typeof cb[0] === 'string') {
-            if (cb[0].match(validJSFunctionNamePattern)) {
-                func = eval(cb[0] + "['" + cb[1] + "']") // eslint-disable-line no-eval
-            }
-        } else {
-            func = cb[0][cb[1]]
-        }
-
-        if (typeof cb[0] === 'string') {
-            if (typeof $global[cb[0]] === 'function') {
-                scope = $global[cb[0]]
-            } else if (cb[0].match(validJSFunctionNamePattern)) {
-                scope = eval(cb[0]) // eslint-disable-line no-eval
-            }
-        } else if (typeof cb[0] === 'object') {
-            scope = cb[0]
-        }
-    } else if (typeof cb === 'function') {
-        func = cb
-    }
-
-    if (typeof func !== 'function') {
-        throw new Error(func + ' is not a valid function')
-    }
-
-    return func.apply(scope, parameters)
-}
-
-function array_merge () {
-    // eslint-disable-line camelcase
-    //  discuss at: https://locutus.io/php/array_merge/
-    // original by: Brett Zamir (https://brett-zamir.me)
-    // bugfixed by: Nate
-    // bugfixed by: Brett Zamir (https://brett-zamir.me)
-    //    input by: josh
-    //   example 1: var $arr1 = {"color": "red", 0: 2, 1: 4}
-    //   example 1: var $arr2 = {0: "a", 1: "b", "color": "green", "shape": "trapezoid", 2: 4}
-    //   example 1: array_merge($arr1, $arr2)
-    //   returns 1: {"color": "green", 0: 2, 1: 4, 2: "a", 3: "b", "shape": "trapezoid", 4: 4}
-    //   example 2: var $arr1 = []
-    //   example 2: var $arr2 = {1: "data"}
-    //   example 2: array_merge($arr1, $arr2)
-    //   returns 2: {0: "data"}
-
-    var args = Array.prototype.slice.call(arguments)
-    var argl = args.length
-    var arg
-    var retObj = {}
-    var k = ''
-    var argil = 0
-    var j = 0
-    var i = 0
-    var ct = 0
-    var toStr = Object.prototype.toString
-    var retArr = true
-
-    for (i = 0; i < argl; i++) {
-        if (toStr.call(args[i]) !== '[object Array]') {
-            retArr = false
-            break
-        }
-    }
-
-    if (retArr) {
-        retArr = []
-        for (i = 0; i < argl; i++) {
-            retArr = retArr.concat(args[i])
-        }
-        return retArr
-    }
-
-    for (i = 0, ct = 0; i < argl; i++) {
-        arg = args[i]
-        if (toStr.call(arg) === '[object Array]') {
-            for (j = 0, argil = arg.length; j < argil; j++) {
-                retObj[ct++] = arg[j]
-            }
-        } else {
-            for (k in arg) {
-                if (arg.hasOwnProperty(k)) {
-                    if (parseInt(k, 10) + '' === k) {
-                        retObj[ct++] = arg[k]
-                    } else {
-                        retObj[k] = arg[k]
-                    }
-                }
-            }
-        }
-    }
-
-    return retObj
-}
 
 /**
  * ----------------------------------------------------------------------------
@@ -925,9 +812,9 @@ if (OPTS.d || OPTS.debug) {
 }
 
 if (OPTS['no-color']) {
-    // let colors = opt.getColors();
-    // colors = removeColor(colors);
-    // opt.setColors(colors);
+    let colors = opt.getColors();
+    colors = removeColor(colors);
+    opt.setColors(colors);
 }
 
 
