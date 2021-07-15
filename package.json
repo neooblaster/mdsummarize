@@ -28,6 +28,6 @@
         "node": ">=12.4.0"
     },
     "dependencies": {
-        "ifopt": "^1.1.1"
+        "ifopt": "^1.6.1"
     }
 }

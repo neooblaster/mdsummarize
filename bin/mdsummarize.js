@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 /**
  * ----------------------------------------------------------------------------
- * cegid_log_reader.js
- *
- * CLI script to process CEGID LOGS.
+ * mdsummarize.js
  *
  * @author    Nicolas DUPRE (VISEO)
- * @release   x.x.2020
- * @version   1.0.0
+ * @release   09.04.2020
  *
  * ----------------------------------------------------------------------------
  */
@@ -65,19 +62,20 @@ const dbgcls = '<<<---------------------------------------------';
 // Caractères suivis par deux-points (valeur optionnelle)
 const options = {
     separator: ",",
-    shortopt: "hd:vr",
+    shortopt: "hd:vrp:",
     longopt: [
         "help",
         "dir:",
         "debug",
         "no-color",
         "verbose",
-        "recursive"
+        "recursive",
+        "profile"
     ]
 };
 
 // Source: https://misc.flogisoft.com/bash/tip_colors_and_formatting
- opt.setColor('fg.Debug', '\x1b[38;5;208m');
+opt.setColor('fg.Debug', '\x1b[38;5;208m');
 
 
 
@@ -140,17 +138,26 @@ let LANG_SETTINGS = {
         "substitution": {
             // Liste of char replacement
             "chars": {
-                "\s": "-",   // Replace spaces with dash
-                "\.": "",    // Replace dot    with nothing
-                "'": "",     // Replace quote  with nothing
-                "`": "",     // Replace        with nothing
-                ":": "",     // Replace colon  with nothing
-                "-{2,}": "-" // Replace double dash by one
+                "'": "",      // Replace quote  with nothing
+                "`": "",      // Replace        with nothing
+                ":": "",      // Replace colon  with nothing
+                "-{2,}": "-"  // Replace double dash by one
             },
             // List of function to executes with arg
             // This will be the stringMacth (title text)
             // Name is for debugging
             "functions": [
+                {
+                    function: function () {
+                        let str = this;
+                        // Removes
+                        str = str.replace(/[`()]/g, '');
+                        // replaces
+                        str = str.replace(/(\s)/g, '-');
+                        return str;
+                    }, name: "specialCharRemove",
+                    args: []
+                },
                 {
                     function: function () {
                         return this.toLowerCase();
@@ -199,7 +206,7 @@ let ALIASES = {
  *
  * @returns {boolean}
  */
-function fileExists(path, level) {
+function fileExists(path, level = 1) {
     try {
         fs.accessSync(path, fs.constants.F_OK | fs.constants.W_OK, (err) => {
             if (err) {
@@ -209,7 +216,7 @@ function fileExists(path, level) {
 
         return true;
     } catch(err) {
-        log(err, level);
+        log(err.toString(), level);
         process.exit();
     }
 }
@@ -816,6 +823,16 @@ if (OPTS['no-color']) {
     colors = removeColor(colors);
     opt.setColors(colors);
 }
+
+// Use specified profile @TODO: complete internal def with profil
+// if (opt.isOption(['profile', 'p'])) {
+//     let profile = opt.getOptValue(['profile', 'p']);
+//     let moduleDir = nodepath.dirname(process.mainModule.filename);
+//
+//     fileExists(`${moduleDir}/../var/profiles/${profile}`);
+//
+//
+// }
 
 
 
